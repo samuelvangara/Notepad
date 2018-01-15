@@ -34,14 +34,15 @@ import java.util.Locale;
 
 public class NotepadHome extends AppCompatActivity {
 
-    private static EditText notes,title;
-    private static FloatingActionButton mainFab,saveFab,shareFab,deleteFab;
+    private EditText notes,title;
+    private FloatingActionButton mainFab,saveFab,shareFab,deleteFab;
     private static Boolean isFabOpen = false;
     private static Animation fab_open, fab_close, rotate_forward, rotate_backward;
-    private static Intent shareIntent;
-    private static ImageView importantOffButton,importantOnButton;
+    private Intent shareIntent;
+    private ImageView importantOffButton,importantOnButton;
     private static String notesData,titleData;
-    private static boolean importantEnabled = false;
+    int importantEnabled;
+    SQLiteDatabase sqLiteDatabase;
     private static File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
     private static final int LOCK_REQUEST_CODE = 221;
     private static final int SECURITY_SETTING_REQUEST_CODE = 233;
@@ -63,26 +64,29 @@ public class NotepadHome extends AppCompatActivity {
         saveFab = findViewById(R.id.saveFab);
         shareFab = findViewById(R.id.shareFab);
         deleteFab = findViewById(R.id.deleteFab);
-        if(importantEnabled) {
-            authenticateApp();
-        }
+
          /**Requesting external storage permission.*/
         int check = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (check == PackageManager.PERMISSION_GRANTED) {
-        } else {
+        if (check != PackageManager.PERMISSION_GRANTED) {
             int PERMISSION_ALL = 1;
             String[] PERMISSIONS = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
             ActivityCompat.requestPermissions(NotepadHome.this, PERMISSIONS, PERMISSION_ALL);
         }
 
-         /**Database Creation Start*/
-        final SQLiteDatabase sqLiteDatabase;
+         /**Database Creation.*/
         sqLiteDatabase = openOrCreateDatabase("Notepad.db", Context.MODE_PRIVATE, null);
         sqLiteDatabase.setVersion(1);
         sqLiteDatabase.setLocale(Locale.getDefault());
-        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS TitleAndNotes(title VARCHAR , notes VARCHAR);");
-        Cursor titleCursor = sqLiteDatabase.rawQuery("Select title from TitleAndNotes", null);
-        Cursor notesCursor = sqLiteDatabase.rawQuery("Select notes from TitleAndNotes", null);
+        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS TitleNotes(title VARCHAR , notes VARCHAR , importantEnabled VARCHAR);");
+        Cursor titleCursor = sqLiteDatabase.rawQuery("Select title from TitleNotes", null);
+        Cursor notesCursor = sqLiteDatabase.rawQuery("Select notes from TitleNotes", null);
+        Cursor importantEnabledCursor = sqLiteDatabase.rawQuery("Select importantEnabled from TitleNotes", null);
+        if (importantEnabledCursor.moveToFirst()) {
+            do{
+            importantEnabled = Integer.parseInt(importantEnabledCursor.getString(0));
+            } while (importantEnabledCursor.moveToNext());
+        }
+
         if (titleCursor.moveToFirst()) {
             do {
                 titleData = titleCursor.getString(0);
@@ -109,7 +113,7 @@ public class NotepadHome extends AppCompatActivity {
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 titleData = title.getText().toString();
                 notesData = notes.getText().toString();
-                sqLiteDatabase.execSQL("INSERT INTO TitleAndNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "');");
+                sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "'" + "," + "'" + importantEnabled + "'" + ");");
             }
 
             @Override
@@ -126,77 +130,103 @@ public class NotepadHome extends AppCompatActivity {
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 titleData = title.getText().toString();
                 notesData = notes.getText().toString();
-                sqLiteDatabase.execSQL("INSERT INTO TitleAndNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "');");
+                sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "'" + "," + "'" + importantEnabled + "'" +");");
             }
             @Override
             public void afterTextChanged(Editable editable) {
             }
         });
+
+        /** Important Enabled. */
+        if(importantEnabled == 1)
+        {
+            authenticateApp();
+            importantOffOnClick(findViewById(R.id.importantOff));
+        }
+        else {
+            importantOffOnClick(findViewById(R.id.importantOn));
+        }
     }
 
+    /** Important Off button functionality*/
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void importantOffOnClick(View view){
+        importantOffButton.setVisibility(View.INVISIBLE);
+        importantOnButton.setVisibility(View.VISIBLE);
+        importantOnButton.setClickable(true);
+        importantOffButton.setClickable(false);
+        title.setTranslationZ(-7);
+        title.setBackgroundColor(getResources().getColor(R.color.Red));
+        title.setHintTextColor(getResources().getColor(R.color.White));
+        title.setTextColor(getResources().getColor(R.color.White));
+        importantEnabled =1;
+        sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "'" + "," + "'" + importantEnabled + "'" +");");
+        Log.i("off",Integer.toString(importantEnabled));
+    }
+
+    /** Important On button functionality*/
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public void importantOnOnClick(View view){
+        importantOffButton.setVisibility(View.VISIBLE);
+        importantOnButton.setVisibility(View.INVISIBLE);
+        importantOffButton.setClickable(true);
+        importantOnButton.setClickable(false);
+        title.setTranslationZ(0);
+        title.setBackgroundColor(getResources().getColor(R.color.White));
+        title.setHintTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        title.setTextColor(getResources().getColor(R.color.Black));
+        importantEnabled = 0;
+        sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "'" + "," + "'" + importantEnabled + "'" +");");
+        Log.i("on",Integer.toString(importantEnabled));
+    }
+
+    /** Fingerprint authentication. */
     private void authenticateApp() {
         KeyguardManager keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            //Create an intent to open device screen lock screen to authenticate
-            //Pass the Screen Lock screen Title and Description
             Intent i = keyguardManager.createConfirmDeviceCredentialIntent(getResources().getString(R.string.unlock), getResources().getString(R.string.confirm_pattern));
             try {
-                //Start activity for result
                 startActivityForResult(i, LOCK_REQUEST_CODE);
             } catch (Exception e) {
-
-                //If some exception occurs means Screen lock is not set up please set screen lock
-                //Open Security screen directly to enable patter lock
                 Intent intent = new Intent(Settings.ACTION_SECURITY_SETTINGS);
+                Toast.makeText(this, getResources().getString(R.string.setting_label), Toast.LENGTH_SHORT).show();
                 try {
-
-                    //Start activity for result
                     startActivityForResult(intent, SECURITY_SETTING_REQUEST_CODE);
-                } catch (Exception ex) {
-
-                }
+                } catch (Exception ex) {}
             }
         }
     }
 
+    /** method to return the result of the authentication. */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case LOCK_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
-
+                    Toast.makeText(this, getResources().getString(R.string.unlock_success), Toast.LENGTH_SHORT).show();
                 } else {
+                    Toast.makeText(this, getResources().getString(R.string.unlock_failed), Toast.LENGTH_SHORT).show();
                 }
                 break;
             case SECURITY_SETTING_REQUEST_CODE:
-                //When user is enabled Security settings then we don't get any kind of RESULT_OK
-                //So we need to check whether device has enabled screen lock or not
                 if (isDeviceSecure()) {
-                    //If screen lock enabled show toast and start intent to authenticate user
                     Toast.makeText(this, getResources().getString(R.string.device_is_secure), Toast.LENGTH_SHORT).show();
                     authenticateApp();
                 } else {
-                    //If screen lock is not enabled just update text
+                    Toast.makeText(this, getResources().getString(R.string.security_device_cancelled), Toast.LENGTH_SHORT).show();
                 }
-
                 break;
         }
     }
 
-    /**
-     * method to return whether device has screen lock enabled or not
-     **/
+    /** method to return whether device has screen lock enabled or not. */
     private boolean isDeviceSecure() {
         KeyguardManager keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
-
-        //this method only work whose api level is greater than or equal to Jelly_Bean (16)
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN && keyguardManager.isKeyguardSecure();
-
-        //You can also use keyguardManager.isDeviceSecure(); but it requires API Level 23
-
     }
 
+    /** Delete Fab button functionality*/
     public void onDeleteFabClick(View view){
         if (isFabOpen) {
             mainFab.startAnimation(rotate_backward);
@@ -208,7 +238,7 @@ public class NotepadHome extends AppCompatActivity {
             deleteFab.setClickable(false);
             isFabOpen = false;
         }
-        if(importantEnabled == false){
+        if(importantEnabled==0){
             title.setText(null);
             notes.setText(null);
         } else {
@@ -217,32 +247,12 @@ public class NotepadHome extends AppCompatActivity {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void importantOffOnClick(View view){
-        importantOffButton.setVisibility(View.INVISIBLE);
-        importantOnButton.setVisibility(View.VISIBLE);
-        importantOnButton.setClickable(true);
-        importantOffButton.setClickable(false);
-        title.setTranslationZ(-7);
-        title.setTextColor(getResources().getColor(R.color.colorAccent));
-        importantEnabled =true;
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public void importantOnOnClick(View view){
-        importantOffButton.setVisibility(View.VISIBLE);
-        importantOnButton.setVisibility(View.INVISIBLE);
-        importantOffButton.setClickable(true);
-        importantOnButton.setClickable(false);
-        title.setTranslationZ(0);
-        title.setTextColor(getResources().getColor(R.color.Black));
-        importantEnabled = false;
-    }
-
+    /** Main Fab button functionality*/
     public void onMainFabClick(View view){
         animateFAB();
     }
 
+    /** Share Fab button functionality*/
     public void onShareFabClick(View view){
         if (isFabOpen) {
             mainFab.startAnimation(rotate_backward);
@@ -261,6 +271,7 @@ public class NotepadHome extends AppCompatActivity {
         startActivity(Intent.createChooser(shareIntent,"Share With: "));
     }
 
+    /** Save Fab button functionality*/
     public void onSaveFabClick(View view){
         try {
             if (isFabOpen) {
@@ -293,6 +304,7 @@ public class NotepadHome extends AppCompatActivity {
 
     }
 
+    /** Menu functionality*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.menu_notepad_home,menu);
@@ -321,6 +333,7 @@ public class NotepadHome extends AppCompatActivity {
         return true;
     }
 
+    /** Fab Animations */
     public void animateFAB() {
         if (isFabOpen) {
             mainFab.startAnimation(rotate_backward);

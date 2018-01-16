@@ -57,6 +57,7 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <ImageButton
+        android:contentDescription="@string/importantOff"
         android:id="@+id/ContactUsSendButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

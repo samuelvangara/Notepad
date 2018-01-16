@@ -18,7 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -176,7 +175,7 @@ public class NotepadHome extends AppCompatActivity {
         title.setHintTextColor(getResources().getColor(R.color.White));
         title.setTextColor(getResources().getColor(R.color.White));
         importantEnabled = 1;
-        sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "'" + "," + "'" + importantEnabled + "'" + ");");
+        sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + title.getText().toString().replace("'","''") + "'" + "," + "'" + notes.getText().toString().replace("'","''") + "'" + "," + "'" + importantEnabled + "'" + ");");
         Toast.makeText(this, getResources().getString(R.string.important_Enabled), Toast.LENGTH_SHORT).show();
     }
 
@@ -194,7 +193,7 @@ public class NotepadHome extends AppCompatActivity {
         title.setHintTextColor(getResources().getColor(R.color.colorPrimaryDark));
         title.setTextColor(getResources().getColor(R.color.Black));
         importantEnabled = 0;
-        sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "'" + "," + "'" + importantEnabled + "'" + ");");
+        sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + title.getText().toString().replace("'","''") + "'" + "," + "'" + notes.getText().toString().replace("'","''") + "'" + "," + "'" + importantEnabled + "'" + ");");
         Toast.makeText(this, getResources().getString(R.string.important_Disabled), Toast.LENGTH_SHORT).show();
     }
 
@@ -423,4 +422,5 @@ public class NotepadHome extends AppCompatActivity {
             isFabOpen = true;
         }
     }
+
 }

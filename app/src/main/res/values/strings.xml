@@ -14,5 +14,7 @@
     <string name="compose_disabled_message1">disabled</string>
     <string name="compose_shortcut_short_label2">ContactUS</string>
     <string name="compose_shortcut_long_label2">Contact US</string>
+    <string name="importantOff">importantOff</string>
+    <string name="importantOn">importantOn</string>
     <string name="compose_disabled_message2">disabled</string>
 </resources>

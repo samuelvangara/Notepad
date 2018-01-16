@@ -29,8 +29,8 @@
 
     <EditText
         android:id="@+id/feedBack"
-        android:layout_width="372dp"
-        android:layout_height="600dp"
+        android:layout_width="378dp"
+        android:layout_height="607dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"

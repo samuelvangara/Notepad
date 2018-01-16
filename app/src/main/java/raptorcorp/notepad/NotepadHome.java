@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,10 +27,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Calendar;
 import java.util.Locale;
 
 public class NotepadHome extends AppCompatActivity {
@@ -38,7 +39,6 @@ public class NotepadHome extends AppCompatActivity {
     private FloatingActionButton mainFab, saveFab, shareFab, deleteFab;
     private static Boolean isFabOpen = false;
     private static Animation fab_open, fab_close, rotate_forward, rotate_backward;
-    private Intent shareIntent;
     private ImageView importantOffButton, importantOnButton;
     private static String notesData, titleData;
     int importantEnabled;
@@ -46,6 +46,7 @@ public class NotepadHome extends AppCompatActivity {
     private static File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
     private static final int LOCK_REQUEST_CODE = 221;
     private static final int SECURITY_SETTING_REQUEST_CODE = 233;
+    Calendar calendar = Calendar.getInstance();
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -111,8 +112,8 @@ public class NotepadHome extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                titleData = title.getText().toString();
-                notesData = notes.getText().toString();
+                titleData = title.getText().toString().replace("'","''");
+                notesData = notes.getText().toString().replace("'","''");
                 sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "'" + "," + "'" + importantEnabled + "'" + ");");
             }
 
@@ -128,8 +129,8 @@ public class NotepadHome extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                titleData = title.getText().toString();
-                notesData = notes.getText().toString();
+                titleData = title.getText().toString().replace("'","''");
+                notesData = notes.getText().toString().replace("'","''");
                 sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "'" + "," + "'" + importantEnabled + "'" + ");");
             }
 
@@ -300,16 +301,23 @@ public class NotepadHome extends AppCompatActivity {
             deleteFab.setClickable(false);
             isFabOpen = false;
         }
-        shareIntent = new Intent();
+        Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, "Title: " + title.getText().toString() + "\n" + "----------------" + "\n" + "Notes: " + notes.getText().toString());
-        startActivity(Intent.createChooser(shareIntent, "Share With: "));
+            if (title.getText().toString().isEmpty()) {
+                String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "_" + (calendar.get(Calendar.MONTH) + 1) + "_" + calendar.get(Calendar.YEAR)+ "_" + calendar.get(Calendar.HOUR_OF_DAY)+ "_" + calendar.get(Calendar.MINUTE);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, calFormat + "\n" + "----------------" + "\n" + notes.getText().toString() + "\n" + "----------------");
+            startActivity(Intent.createChooser(shareIntent, "Share With: "));
+        } else {
+            shareIntent.putExtra(Intent.EXTRA_TEXT, title.getText().toString() + "\n" + "----------------" + "\n" + notes.getText().toString() + "\n" + "----------------");
+            startActivity(Intent.createChooser(shareIntent, "Share With: "));
+        }
     }
 
     /**
      * Save Fab button functionality
      */
+    @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     public void onSaveFabClick(View view) {
         try {
             if (isFabOpen) {
@@ -322,19 +330,37 @@ public class NotepadHome extends AppCompatActivity {
                 deleteFab.setClickable(false);
                 isFabOpen = false;
             }
-            File notesFile = new File(path, title.getText().toString().replaceAll("\\s", "") + "." + "txt");
-            FileOutputStream fileOutputStream = new FileOutputStream(notesFile, false);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
-            outputStreamWriter.append("Title: " + title.getText().toString());
-            outputStreamWriter.append("\n\r");
-            outputStreamWriter.append("*************************");
-            outputStreamWriter.append("\n\r");
-            outputStreamWriter.append("Notes: " + notes.getText().toString());
-            outputStreamWriter.append("\n\r");
-            outputStreamWriter.append("*************************");
-            outputStreamWriter.close();
-            fileOutputStream.close();
-            Toast.makeText(NotepadHome.this, "Your data has been Saved to " + title.getText().toString().replaceAll("\\s", "") + "." + "txt in your downloads folder", Toast.LENGTH_LONG).show();
+            if (title.getText().toString().isEmpty()) {
+                String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "_" + (calendar.get(Calendar.MONTH) + 1) + "_" + calendar.get(Calendar.YEAR)+ "_" + calendar.get(Calendar.HOUR_OF_DAY)+ "_" + calendar.get(Calendar.MINUTE);
+                File notesFile = new File(path, calFormat + "." + "txt");
+                FileOutputStream fileOutputStream = new FileOutputStream(notesFile, false);
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+                outputStreamWriter.append(calFormat);
+                outputStreamWriter.append("\n\r");
+                outputStreamWriter.append("*************************");
+                outputStreamWriter.append("\n\r");
+                outputStreamWriter.append(notes.getText().toString());
+                outputStreamWriter.append("\n\r");
+                outputStreamWriter.append("*************************");
+                outputStreamWriter.close();
+                fileOutputStream.close();
+                Toast.makeText(NotepadHome.this, "Your data has been Saved to " + calFormat + "." + "txt in your downloads folder", Toast.LENGTH_LONG).show();
+
+            } else {
+                File notesFile = new File(path, title.getText().toString().replaceAll("\\s", "") + "." + "txt");
+                FileOutputStream fileOutputStream = new FileOutputStream(notesFile, false);
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+                outputStreamWriter.append(title.getText().toString());
+                outputStreamWriter.append("\n\r");
+                outputStreamWriter.append("*************************");
+                outputStreamWriter.append("\n\r");
+                outputStreamWriter.append(notes.getText().toString());
+                outputStreamWriter.append("\n\r");
+                outputStreamWriter.append("*************************");
+                outputStreamWriter.close();
+                fileOutputStream.close();
+                Toast.makeText(NotepadHome.this, "Your data has been Saved to " + title.getText().toString().replaceAll("\\s", "") + "." + "txt in your downloads folder", Toast.LENGTH_LONG).show();
+            }
         } catch (Exception e) {
             Toast.makeText(NotepadHome.this, e.toString() + " please notify us about the issue. ", Toast.LENGTH_LONG).show();
         }

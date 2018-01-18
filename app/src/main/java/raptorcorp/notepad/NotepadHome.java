@@ -278,8 +278,9 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
     public void onDeleteFabClick(View view) {
         isFabOpen();
         if (importantEnabled == 0) {
-            sqLiteDatabase.execSQL("DELETE FROM NotesMetaData WHERE title=" + "'" + title.getText().toString().replace("'", "''") + "'" + " AND notes=" + "'" + notes.getText().toString().replace("'", "''") + "'" + ";" );
+            sqLiteDatabase.execSQL("DELETE FROM NotesMetaData WHERE title=" + "'" + title.getText().toString().replace("'", "''") + /*"'" + " AND notes=" + "'" + notes.getText().toString().replace("'", "''") +*/ "';" );
             sqLiteDatabase.execSQL("DELETE FROM TitleNotes WHERE title=" + "'" + title.getText().toString().replace("'", "''") + "'" + " AND notes=" + "'" + notes.getText().toString().replace("'", "''") + "'" + ";" );
+            Log.i("test",title.getText().toString().replace("'", "''"));
             title.setText("");
             notes.setText("");
         } else {
@@ -389,6 +390,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                     String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "_" + (calendar.get(Calendar.MONTH) + 1) + "_" + calendar.get(Calendar.YEAR) + "_" + calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE);
                     sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + calFormat + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
                     Intent addIntent = new Intent(this, NotepadHome.class);
+                    addIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     title.setText("");
                     notes.setText("");
                     importantIsOffed();
@@ -402,6 +404,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                     importantEnabled = 0;
                     sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
                     Intent addIntent = new Intent(this, NotepadHome.class);
+                    addIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(addIntent);
                 }
 

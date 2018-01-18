@@ -5,13 +5,11 @@ import android.database.Cursor;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
 import java.util.ArrayList;
 
 public class NotepadListHome extends NotepadHome {
@@ -44,12 +42,12 @@ public class NotepadListHome extends NotepadHome {
                 Cursor importantEnabledCursor = sqLiteDatabase.rawQuery("Select importantEnabled from NotesMetaData where title=" + "'" + retrieve + "'", null);
                 if (titleCursor.moveToFirst()) {
                     do {
-                       title.setText(titleCursor.getString(0));
+                        title.setText(titleCursor.getString(0));
                     } while (titleCursor.moveToNext());
                 }
                 if (notesCursor.moveToFirst()) {
                     do {
-                     notes.setText(notesCursor.getString(0));
+                        notes.setText(notesCursor.getString(0));
                     } while (notesCursor.moveToNext());
                 }
                 if (importantEnabledCursor.moveToFirst()) {
@@ -58,7 +56,6 @@ public class NotepadListHome extends NotepadHome {
                     } while (importantEnabledCursor.moveToNext());
                 }
                 Intent homeIntent = new Intent(NotepadListHome.this, NotepadHome.class);
-                authenticateApp();
                 importantIsOned();
                 homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(homeIntent);

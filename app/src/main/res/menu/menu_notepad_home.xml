@@ -14,13 +14,13 @@
 
     <item android:title="List"
         android:id="@+id/notepadList"
-        android:icon="@android:drawable/ic_dialog_dialer"
+        android:icon="@drawable/list"
         app:showAsAction="always">
     </item>
 
     <item android:title="Add"
         android:id="@+id/add"
-        android:icon="@android:drawable/ic_input_add"
+        android:icon="@drawable/add"
         app:showAsAction="always">
     </item>
 

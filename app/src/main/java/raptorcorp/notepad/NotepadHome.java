@@ -278,8 +278,10 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
     public void onDeleteFabClick(View view) {
         isFabOpen();
         if (importantEnabled == 0) {
-            title.setText(null);
-            notes.setText(null);
+            sqLiteDatabase.execSQL("DELETE FROM NotesMetaData WHERE title=" + "'" + title.getText().toString().replace("'", "''") + "'" + " AND notes=" + "'" + notes.getText().toString().replace("'", "''") + "'" + ";" );
+            sqLiteDatabase.execSQL("DELETE FROM TitleNotes WHERE title=" + "'" + title.getText().toString().replace("'", "''") + "'" + " AND notes=" + "'" + notes.getText().toString().replace("'", "''") + "'" + ";" );
+            title.setText("");
+            notes.setText("");
         } else {
             Toast.makeText(NotepadHome.this, "Important is enabled, disable it if u wish to delete the file", Toast.LENGTH_LONG).show();
         }

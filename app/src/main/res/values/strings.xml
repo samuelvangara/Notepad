@@ -17,4 +17,10 @@
     <string name="importantOff">importantOff</string>
     <string name="importantOn">importantOn</string>
     <string name="compose_disabled_message2">disabled</string>
+    <string name="title_activity_notepad_list_drawer">Notepad</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 </resources>

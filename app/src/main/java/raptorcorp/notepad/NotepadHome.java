@@ -18,40 +18,49 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Calendar;
-import java.util.Locale;
 
-public class NotepadHome extends AppCompatActivity {
+public class NotepadHome extends AppCompatActivity implements GestureDetector.OnGestureListener {
 
-    private EditText notes, title;
-    private FloatingActionButton mainFab, saveFab, shareFab, deleteFab;
-    private static Boolean isFabOpen = false;
-    private static Animation fab_open, fab_close, rotate_forward, rotate_backward;
-    private ImageView importantOffButton, importantOnButton;
-    private static String notesData, titleData;
-    int importantEnabled;
-    SQLiteDatabase sqLiteDatabase;
-    private static File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-    private static final int LOCK_REQUEST_CODE = 221;
-    private static final int SECURITY_SETTING_REQUEST_CODE = 233;
-    Calendar calendar = Calendar.getInstance();
+    public EditText notes, title;
+    public static FloatingActionButton mainFab, saveFab, shareFab, deleteFab;
+    public static Boolean isFabOpen = false;
+    public static Animation fab_open, fab_close, rotate_forward, rotate_backward;
+    public static ImageView importantOffButton, importantOnButton;
+    public static String notesData, titleData;
+    public static int importantEnabled;
+    public SQLiteDatabase sqLiteDatabase;
+    public static File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+    public static final int LOCK_REQUEST_CODE = 221;
+    public static final int SECURITY_SETTING_REQUEST_CODE = 233;
+    public static final int PICKFILE_RESULT_CODE = 1;
+    public static Calendar calendar = Calendar.getInstance();
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notepad_home);
+
+        /** LAbel Definitions*/
         fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
         fab_close = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
         rotate_forward = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_forward);
@@ -76,8 +85,8 @@ public class NotepadHome extends AppCompatActivity {
         /**Database Creation. DbName:Notepad.db,TableName:TitleNotes*/
         sqLiteDatabase = openOrCreateDatabase("Notepad.db", Context.MODE_PRIVATE, null);
         sqLiteDatabase.setVersion(1);
-        sqLiteDatabase.setLocale(Locale.getDefault());
         sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS TitleNotes(title VARCHAR , notes VARCHAR , importantEnabled VARCHAR);");
+        sqLiteDatabase.execSQL("CREATE TABLE IF NOT EXISTS NotesMetaData(title VARCHAR UNIQUE, notes VARCHAR , importantEnabled VARCHAR);");
         Cursor titleCursor = sqLiteDatabase.rawQuery("Select title from TitleNotes", null);
         Cursor notesCursor = sqLiteDatabase.rawQuery("Select notes from TitleNotes", null);
         Cursor importantEnabledCursor = sqLiteDatabase.rawQuery("Select importantEnabled from TitleNotes", null);
@@ -111,8 +120,8 @@ public class NotepadHome extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                titleData = title.getText().toString().replace("'","''");
-                notesData = notes.getText().toString().replace("'","''");
+                titleData = title.getText().toString().replace("'", "''");
+                notesData = notes.getText().toString().replace("'", "''");
                 sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "'" + "," + "'" + importantEnabled + "'" + ");");
             }
 
@@ -128,9 +137,9 @@ public class NotepadHome extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                titleData = title.getText().toString().replace("'","''");
-                notesData = notes.getText().toString().replace("'","''");
-                sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "'" + "," + "'" + importantEnabled + "'" + ");");
+                titleData = title.getText().toString().replace("'", "''");
+                notesData = notes.getText().toString().replace("'", "''");
+                sqLiteDatabase.execSQL("INSERT or replace INTO TitleNotes VALUES('" + titleData + "'" + "," + "'" + notesData + "'" + "," + "'" + importantEnabled + "'" + ");");
             }
 
             @Override
@@ -141,23 +150,9 @@ public class NotepadHome extends AppCompatActivity {
         /** Important Enabled. */
         if (importantEnabled == 1) {
             authenticateApp();
-            importantOffButton.setVisibility(View.INVISIBLE);
-            importantOnButton.setVisibility(View.VISIBLE);
-            importantOnButton.setClickable(true);
-            importantOffButton.setClickable(false);
-            title.setTranslationZ(-7);
-            title.setBackgroundColor(getResources().getColor(R.color.Red));
-            title.setHintTextColor(getResources().getColor(R.color.White));
-            title.setTextColor(getResources().getColor(R.color.White));
+            importantIsOned();
         } else {
-            importantOffButton.setVisibility(View.VISIBLE);
-            importantOnButton.setVisibility(View.INVISIBLE);
-            importantOffButton.setClickable(true);
-            importantOnButton.setClickable(false);
-            title.setTranslationZ(0);
-            title.setBackgroundColor(getResources().getColor(R.color.White));
-            title.setHintTextColor(getResources().getColor(R.color.colorPrimaryDark));
-            title.setTextColor(getResources().getColor(R.color.Black));
+            importantIsOffed();
         }
     }
 
@@ -166,16 +161,9 @@ public class NotepadHome extends AppCompatActivity {
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void importantOffOnClick(View view) {
-        importantOffButton.setVisibility(View.INVISIBLE);
-        importantOnButton.setVisibility(View.VISIBLE);
-        importantOnButton.setClickable(true);
-        importantOffButton.setClickable(false);
-        title.setTranslationZ(-7);
-        title.setBackgroundColor(getResources().getColor(R.color.Red));
-        title.setHintTextColor(getResources().getColor(R.color.White));
-        title.setTextColor(getResources().getColor(R.color.White));
+        importantIsOned();
         importantEnabled = 1;
-        sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + title.getText().toString().replace("'","''") + "'" + "," + "'" + notes.getText().toString().replace("'","''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+        sqLiteDatabase.execSQL("INSERT or replace INTO TitleNotes VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
         Toast.makeText(this, getResources().getString(R.string.important_Enabled), Toast.LENGTH_SHORT).show();
     }
 
@@ -184,23 +172,16 @@ public class NotepadHome extends AppCompatActivity {
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void importantOnOnClick(View view) {
-        importantOffButton.setVisibility(View.VISIBLE);
-        importantOnButton.setVisibility(View.INVISIBLE);
-        importantOffButton.setClickable(true);
-        importantOnButton.setClickable(false);
-        title.setTranslationZ(0);
-        title.setBackgroundColor(getResources().getColor(R.color.White));
-        title.setHintTextColor(getResources().getColor(R.color.colorPrimaryDark));
-        title.setTextColor(getResources().getColor(R.color.Black));
+        importantIsOffed();
         importantEnabled = 0;
-        sqLiteDatabase.execSQL("INSERT INTO TitleNotes VALUES('" + title.getText().toString().replace("'","''") + "'" + "," + "'" + notes.getText().toString().replace("'","''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+        sqLiteDatabase.execSQL("INSERT or replace INTO TitleNotes VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
         Toast.makeText(this, getResources().getString(R.string.important_Disabled), Toast.LENGTH_SHORT).show();
     }
 
     /**
      * Fingerprint authentication.
      */
-    private void authenticateApp() {
+    public void authenticateApp() {
         KeyguardManager keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Intent i = keyguardManager.createConfirmDeviceCredentialIntent(getResources().getString(R.string.unlock), getResources().getString(R.string.confirm_pattern));
@@ -220,6 +201,7 @@ public class NotepadHome extends AppCompatActivity {
     /**
      * method to return the result of the authentication.
      */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -245,6 +227,40 @@ public class NotepadHome extends AppCompatActivity {
                     Toast.makeText(this, getResources().getString(R.string.security_device_cancelled), Toast.LENGTH_SHORT).show();
                 }
                 break;
+            /** File browse and picker */
+            case PICKFILE_RESULT_CODE:
+                if (resultCode == RESULT_OK) {
+                    String FilePath = data.getData().getPath();
+                    Log.i("path", FilePath.toString());
+                    File newFile = new File(FilePath);
+                    String fileName = newFile.getName();
+                    String titleName = fileName.substring(0, fileName.indexOf("."));
+                    String filePath = newFile.getAbsolutePath().replaceAll(".*:", "");
+                    String finalFilePath = filePath.substring(0, filePath.lastIndexOf(File.separator));
+                    File file = new File(finalFilePath, fileName);
+                    StringBuilder text = new StringBuilder();
+                    try {
+                        BufferedReader br = new BufferedReader(new FileReader(file));
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            text.append(line);
+                            text.append('\n');
+                        }
+                        br.close();
+                    } catch (IOException e) {
+                        Toast.makeText(NotepadHome.this, "There seems to be an issue. Please contact us.", Toast.LENGTH_LONG).show();
+                    }
+                    importantIsOffed();
+                    importantEnabled = 0;
+                    if (titleName.isEmpty()) {
+                        title.setText("");
+                        notes.setText(text);
+                    } else {
+                        title.setText(titleName);
+                        notes.setText(text);
+                    }
+                }
+                break;
         }
     }
 
@@ -260,16 +276,7 @@ public class NotepadHome extends AppCompatActivity {
      * Delete Fab button functionality
      */
     public void onDeleteFabClick(View view) {
-        if (isFabOpen) {
-            mainFab.startAnimation(rotate_backward);
-            saveFab.startAnimation(fab_close);
-            shareFab.startAnimation(fab_close);
-            deleteFab.startAnimation(fab_close);
-            saveFab.setClickable(false);
-            shareFab.setClickable(false);
-            deleteFab.setClickable(false);
-            isFabOpen = false;
-        }
+        isFabOpen();
         if (importantEnabled == 0) {
             title.setText(null);
             notes.setText(null);
@@ -290,22 +297,13 @@ public class NotepadHome extends AppCompatActivity {
      * Share Fab button functionality
      */
     public void onShareFabClick(View view) {
-        if (isFabOpen) {
-            mainFab.startAnimation(rotate_backward);
-            saveFab.startAnimation(fab_close);
-            shareFab.startAnimation(fab_close);
-            deleteFab.startAnimation(fab_close);
-            saveFab.setClickable(false);
-            shareFab.setClickable(false);
-            deleteFab.setClickable(false);
-            isFabOpen = false;
-        }
+        isFabOpen();
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
-            if (title.getText().toString().isEmpty()) {
-                String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "_" + (calendar.get(Calendar.MONTH) + 1) + "_" + calendar.get(Calendar.YEAR)+ "_" + calendar.get(Calendar.HOUR_OF_DAY)+ "_" + calendar.get(Calendar.MINUTE);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, calFormat + "\n" + "----------------" + "\n" + notes.getText().toString() + "\n" + "----------------");
+        if (title.getText().toString().isEmpty()) {
+            String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "_" + (calendar.get(Calendar.MONTH) + 1) + "_" + calendar.get(Calendar.YEAR) + "_" + calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, calFormat + "\n" + "----------------" + "\n" + notes.getText().toString() + "\n" + "----------------");
             startActivity(Intent.createChooser(shareIntent, "Share With: "));
         } else {
             shareIntent.putExtra(Intent.EXTRA_TEXT, title.getText().toString() + "\n" + "----------------" + "\n" + notes.getText().toString() + "\n" + "----------------");
@@ -319,19 +317,11 @@ public class NotepadHome extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.GINGERBREAD)
     public void onSaveFabClick(View view) {
         try {
-            if (isFabOpen) {
-                mainFab.startAnimation(rotate_backward);
-                saveFab.startAnimation(fab_close);
-                shareFab.startAnimation(fab_close);
-                deleteFab.startAnimation(fab_close);
-                saveFab.setClickable(false);
-                shareFab.setClickable(false);
-                deleteFab.setClickable(false);
-                isFabOpen = false;
-            }
+            isFabOpen();
             if (title.getText().toString().isEmpty()) {
-                String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "_" + (calendar.get(Calendar.MONTH) + 1) + "_" + calendar.get(Calendar.YEAR)+ "_" + calendar.get(Calendar.HOUR_OF_DAY)+ "_" + calendar.get(Calendar.MINUTE);
-                File notesFile = new File(path, calFormat + "." + "txt");
+                String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "_" + (calendar.get(Calendar.MONTH) + 1) + "_" + calendar.get(Calendar.YEAR) + "_" + calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE);
+                File notesFile = new File(path.toString() + "/Notepad", calFormat + "." + "txt");
+                notesFile.getParentFile().mkdirs();
                 FileOutputStream fileOutputStream = new FileOutputStream(notesFile, false);
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
                 outputStreamWriter.append(calFormat);
@@ -343,10 +333,11 @@ public class NotepadHome extends AppCompatActivity {
                 outputStreamWriter.append("*************************");
                 outputStreamWriter.close();
                 fileOutputStream.close();
-                Toast.makeText(NotepadHome.this, "Your data has been Saved to " + calFormat + "." + "txt in your downloads folder", Toast.LENGTH_LONG).show();
+                Toast.makeText(NotepadHome.this, "Your data has been Saved to " + calFormat + "." + "txt in your downloads->Notepad folder", Toast.LENGTH_LONG).show();
 
             } else {
-                File notesFile = new File(path, title.getText().toString().replaceAll("\\s", "") + "." + "txt");
+                File notesFile = new File(path + "/Notepad", title.getText().toString().replaceAll("\\s", "") + "." + "txt");
+                notesFile.getParentFile().mkdirs();
                 FileOutputStream fileOutputStream = new FileOutputStream(notesFile, false);
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
                 outputStreamWriter.append(title.getText().toString());
@@ -358,7 +349,7 @@ public class NotepadHome extends AppCompatActivity {
                 outputStreamWriter.append("*************************");
                 outputStreamWriter.close();
                 fileOutputStream.close();
-                Toast.makeText(NotepadHome.this, "Your data has been Saved to " + title.getText().toString().replaceAll("\\s", "") + "." + "txt in your downloads folder", Toast.LENGTH_LONG).show();
+                Toast.makeText(NotepadHome.this, "Your data has been Saved to " + title.getText().toString().replaceAll("\\s", "") + "." + "txt in your downloads->Notepad folder", Toast.LENGTH_LONG).show();
             }
         } catch (Exception e) {
             Toast.makeText(NotepadHome.this, e.toString() + " please notify us about the issue. ", Toast.LENGTH_LONG).show();
@@ -375,24 +366,58 @@ public class NotepadHome extends AppCompatActivity {
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.contactUs:
-                if (isFabOpen) {
-                    mainFab.startAnimation(rotate_backward);
-                    saveFab.startAnimation(fab_close);
-                    shareFab.startAnimation(fab_close);
-                    deleteFab.startAnimation(fab_close);
-                    saveFab.setClickable(false);
-                    shareFab.setClickable(false);
-                    deleteFab.setClickable(false);
-                    isFabOpen = false;
-                }
+                isFabOpen();
                 Intent contactUsIntent = new Intent(this, ContactusActivity.class);
                 startActivity(contactUsIntent);
                 break;
-            case R.id.nightMode:
+            case R.id.Browse:
+                isFabOpen();
+                Intent browseIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                browseIntent.setType("text/plain");
+                startActivityForResult(browseIntent, PICKFILE_RESULT_CODE);
+                break;
+
+            case R.id.add:
+                if (title.getText().toString().isEmpty()) {
+                    String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "_" + (calendar.get(Calendar.MONTH) + 1) + "_" + calendar.get(Calendar.YEAR) + "_" + calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE);
+                    sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + calFormat + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                    Intent addIntent = new Intent(this, NotepadHome.class);
+                    title.setText("");
+                    notes.setText("");
+                    importantIsOffed();
+                    importantEnabled = 0;
+                    startActivity(addIntent);
+                } else {
+                    sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                    title.setText("");
+                    notes.setText("");
+                    importantIsOffed();
+                    importantEnabled = 0;
+                    sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                    Intent addIntent = new Intent(this, NotepadHome.class);
+                    startActivity(addIntent);
+                }
+
+                break;
+
+            case R.id.notepadList:
+                if (title.getText().toString().isEmpty()) {
+                    String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "_" + (calendar.get(Calendar.MONTH) + 1) + "_" + calendar.get(Calendar.YEAR) + "_" + calendar.get(Calendar.HOUR_OF_DAY) + "_" + calendar.get(Calendar.MINUTE);
+                    sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + calFormat + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                    Intent listIntent = new Intent(this, NotepadListHome.class);
+                    importantEnabled=0;
+                    startActivity(listIntent);
+                } else {
+                    sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                    Intent listIntent = new Intent(this, NotepadListHome.class);
+                    importantEnabled=0;
+                    startActivity(listIntent);
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -423,4 +448,116 @@ public class NotepadHome extends AppCompatActivity {
         }
     }
 
+    /**
+     * To close fab whenever open
+     */
+    public void isFabOpen() {
+        if (isFabOpen) {
+            mainFab.startAnimation(rotate_backward);
+            saveFab.startAnimation(fab_close);
+            shareFab.startAnimation(fab_close);
+            deleteFab.startAnimation(fab_close);
+            saveFab.setClickable(false);
+            shareFab.setClickable(false);
+            deleteFab.setClickable(false);
+            isFabOpen = false;
+        }
+    }
+
+    /**
+     * Important button is oned
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void importantIsOned() {
+        importantOffButton.setVisibility(View.INVISIBLE);
+        importantOnButton.setVisibility(View.VISIBLE);
+        importantOnButton.setClickable(true);
+        importantOffButton.setClickable(false);
+        title.setTranslationZ(-7);
+        title.setBackgroundColor(getResources().getColor(R.color.Red));
+        title.setHintTextColor(getResources().getColor(R.color.White));
+        title.setTextColor(getResources().getColor(R.color.White));
+    }
+
+    /**
+     * Important button is offed
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void importantIsOffed() {
+        importantOffButton.setVisibility(View.VISIBLE);
+        importantOnButton.setVisibility(View.INVISIBLE);
+        importantOffButton.setClickable(true);
+        importantOnButton.setClickable(false);
+        title.setTranslationZ(0);
+        title.setBackgroundColor(getResources().getColor(R.color.White));
+        title.setHintTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        title.setTextColor(getResources().getColor(R.color.Black));
+    }
+
+
+    /**
+     * Gestures
+     */
+
+    float x1, y1;
+    float x2, y2;
+
+    @Override
+    public boolean onDown(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+        return false;
+    }
+
+    public boolean onTouchEvent(MotionEvent touchevent) {
+        switch (touchevent.getAction()) {
+// when user first touches the screen we get x and y coordinate
+            case MotionEvent.ACTION_DOWN: {
+                x1 = touchevent.getX();
+                y1 = touchevent.getY();
+                break;
+            }
+            case MotionEvent.ACTION_UP: {
+                x2 = touchevent.getX();
+                y2 = touchevent.getY();
+//if left to right sweep event on screen
+                if (x1 < x2) {
+                    Toast.makeText(this, "Left to Right Swap Performed", Toast.LENGTH_LONG).show();
+                    Intent i = new Intent(NotepadHome.this, NotepadListHome.class);
+                    startActivity(i);
+                }
+// if right to left sweep event on screen
+                if (x1 > x2) {
+                    Intent i = new Intent(this, NotepadHome.class);
+                    startActivity(i);
+                    Toast.makeText(this, "Right to Left Swap Performed", Toast.LENGTH_LONG).show();
+
+                }
+            }
+        }
+        return false;
+    }
 }

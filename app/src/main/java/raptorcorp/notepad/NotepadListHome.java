@@ -7,8 +7,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -48,7 +48,6 @@ public class NotepadListHome extends NotepadHome implements GestureDetector.OnGe
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String retrieve = notepadListArray.get(i);
-                Log.i("test", retrieve);
                 Cursor titleCursor = sqLiteDatabase.rawQuery("Select title from NotesMetaData where title=" + "'" + retrieve + "'", null);
                 Cursor notesCursor = sqLiteDatabase.rawQuery("Select notes from NotesMetaData where title=" + "'" + retrieve + "'", null);
                 Cursor importantEnabledCursor = sqLiteDatabase.rawQuery("Select importantEnabled from NotesMetaData where title=" + "'" + retrieve + "'", null);
@@ -81,6 +80,7 @@ public class NotepadListHome extends NotepadHome implements GestureDetector.OnGe
             }
         });
 
+        /** List Swipe */
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
             public void create(SwipeMenu menu) {
@@ -122,6 +122,23 @@ public class NotepadListHome extends NotepadHome implements GestureDetector.OnGe
                 return false;
             }
         });
+    }
+
+    /** On Back Pressed*/
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
     /**

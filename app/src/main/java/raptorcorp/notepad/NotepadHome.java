@@ -18,8 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -29,7 +29,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -236,7 +235,6 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
             case FILE_RESULT_CODE:
                 if (resultCode == RESULT_OK) {
                     String FilePath = data.getData().getPath();
-                    Log.i("path", FilePath.toString());
                     File newFile = new File(FilePath);
                     String fileName = newFile.getName();
                     String titleName = fileName.substring(0, fileName.indexOf("."));
@@ -438,7 +436,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                         Intent listIntent = new Intent(this, NotepadListHome.class);
                         startActivity(listIntent);
                         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
-                        Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_LONG).show();
+                        Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
@@ -447,11 +445,28 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                     Intent listIntent = new Intent(this, NotepadListHome.class);
                     startActivity(listIntent);
                     overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
-                    Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_LONG).show();
+                    Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /** On Back Pressed*/
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
     /**

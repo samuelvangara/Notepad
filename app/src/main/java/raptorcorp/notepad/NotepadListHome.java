@@ -161,8 +161,8 @@ public class NotepadListHome extends NotepadHome implements GestureDetector.OnGe
         switch (item.getItemId()) {
             case R.id.contactUs:
                 isFabOpen();
-                Intent contactUsIntent = new Intent(this, ContactusActivity.class);
-                startActivity(contactUsIntent);
+                Intent AboutNotepadIntent = new Intent(this, AboutNotepad.class);
+                startActivity(AboutNotepadIntent);
                 break;
             case R.id.Browse:
                 isFabOpen();

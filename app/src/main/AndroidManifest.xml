@@ -27,7 +27,8 @@
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustResize"
         tools:ignore="GoogleAppIndexingWarning"
-        tools:targetApi="n">
+        tools:targetApi="n"
+        android:fullBackupContent="true">
         <activity
             android:name=".NotepadHome"
             android:supportsPictureInPicture="true">
@@ -40,18 +41,15 @@
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
-            android:name=".ContactusActivity"
-            android:label="Contact Us"
-            android:parentActivityName=".NotepadHome"
-            android:resizeableActivity="true"
-            android:supportsPictureInPicture="true" />
-
-        <activity
             android:name=".NotepadListHome"
             android:label="Notes List"
             android:resizeableActivity="true"
             android:supportsPictureInPicture="true" />
-
+        <activity
+            android:name=".AboutNotepad"
+            android:label="@string/title_activity_about_notepad"
+            android:resizeableActivity="true"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

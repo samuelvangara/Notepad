@@ -367,8 +367,8 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
         switch (item.getItemId()) {
             case R.id.contactUs:
                 isFabOpen();
-                Intent contactUsIntent = new Intent(this, ContactusActivity.class);
-                startActivity(contactUsIntent);
+                Intent AboutNotepadIntent = new Intent(this, AboutNotepad.class);
+                startActivity(AboutNotepadIntent);
                 break;
             case R.id.Browse:
                 isFabOpen();

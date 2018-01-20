@@ -1,0 +1,27 @@
+ "***About the Application.***\n\n"
+
+        "A light weight application to make notes, So that you can concentrate on bigger things in life.\n"
+        "Your data is backed up securely (So much that even we can’t access it) to restore during application reinstalls.\n"
+        "To avoid those overly curious people who you give your phone to, there is authentication requirement for marked notes.\n"
+        "Hassel free operation as your data is saved instantaneous (every moment literally not even kidding).\n"
+        "This application support across devices of various screen sizes. Whatever it is Phones, tablets, 16:9, 18:9 phablets we got you covered. \n"
+        "Share the saved notes via any application which supports text or save the notes as a text file.\n"
+        "Browse to open a text file (.txt) and save them to notes or to save as a different text file.\n\n"
+
+        "***Things you could expect from this application:*** \n\n"
+
+        "Support across devices.\n"
+		"Security authentication  no way to read unless saved.\n"
+		"Important feature to prevent delete from list or during writing.\n"
+        "Light weight.\n"
+		"One stop need.\n"
+        "Save to .txt. \n"
+        "Open .txt. \n"
+        "Share the content across device via text. \n \n"
+		
+		"***Things we expect from this application.*** \n \n"
+		
+		"Your kind and valuable feedback to help us grow. \n"
+		"A little love in share our application with others. \n \n"
+		
+		"***About us.*** \n\n"

@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
@@ -71,11 +72,13 @@ public class NotepadListHome extends NotepadHome implements GestureDetector.OnGe
                     sqLiteDatabase.execSQL("INSERT or replace INTO TitleNotes VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
                     overridePendingTransition(R.anim.slide_to_left, R.anim.slide_from_right);
                     startActivity(homeIntent);
+                    isFabOpen();
                 } else {
                     Intent homeIntent = new Intent(NotepadListHome.this, NotepadHome.class);
                     homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     overridePendingTransition(R.anim.slide_to_left, R.anim.slide_from_right);
                     startActivity(homeIntent);
+                    isFabOpen();
                 }
             }
         });
@@ -108,11 +111,11 @@ public class NotepadListHome extends NotepadHome implements GestureDetector.OnGe
                             Intent addIntent = new Intent(NotepadListHome.this, NotepadListHome.class);
                             addIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(addIntent);
-                            Toast.makeText(NotepadListHome.this, "Important is enabled, disable it if u wish to delete the file", Toast.LENGTH_LONG).show();
+                            Toast.makeText(NotepadListHome.this, "Important is enabled, disable it if u wish to delete the file", Toast.LENGTH_SHORT).show();
                         } else {
                             sqLiteDatabase.execSQL("DELETE FROM NotesMetaData WHERE title=" + "'" + notepadListArray.get(position).replace("'", "''") + "';");
                             sqLiteDatabase.execSQL("DELETE FROM TitleNotes WHERE title=" + "'" + notepadListArray.get(position).replace("'", "''") + "';");
-                             Intent addIntent = new Intent(NotepadListHome.this, NotepadListHome.class);
+                            Intent addIntent = new Intent(NotepadListHome.this, NotepadListHome.class);
                             addIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(addIntent);
                         }
@@ -124,9 +127,11 @@ public class NotepadListHome extends NotepadHome implements GestureDetector.OnGe
         });
     }
 
-    /** On Back Pressed*/
+    /**
+     * On Back Pressed
+     */
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
                 && keyCode == KeyEvent.KEYCODE_BACK
                 && event.getRepeatCount() == 0) {
@@ -212,6 +217,7 @@ public class NotepadListHome extends NotepadHome implements GestureDetector.OnGe
         return false;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public boolean onTouchEvent(MotionEvent touchevent) {
         switch (touchevent.getAction()) {
             case MotionEvent.ACTION_DOWN: {
@@ -221,16 +227,28 @@ public class NotepadListHome extends NotepadHome implements GestureDetector.OnGe
             case MotionEvent.ACTION_UP: {
                 x2 = touchevent.getX();
                 if (x1 < x2) {
-                    Intent listIntent = new Intent(NotepadListHome.this, NotepadListHome.class);
-                    startActivity(listIntent);
-                    finish();
+                    isFabOpen();
+                    Intent addIntent = new Intent(this, NotepadHome.class);
+                    addIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    title.setText("");
+                    notes.setText("");
+                    importantIsOffed();
+                    importantEnabled = 0;
+                    startActivity(addIntent);
                     overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+                    finish();
                 }
                 if (x1 > x2) {
-                    Intent homeIntent = new Intent(NotepadListHome.this, NotepadHome.class);
-                    startActivity(homeIntent);
-                    finish();
+                    isFabOpen();
+                    Intent addIntent = new Intent(this, NotepadHome.class);
+                    addIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    title.setText("");
+                    notes.setText("");
+                    importantIsOffed();
+                    importantEnabled = 0;
+                    startActivity(addIntent);
                     overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                    finish();
                 }
                 break;
             }

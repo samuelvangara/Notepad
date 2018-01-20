@@ -29,6 +29,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -251,7 +252,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                         }
                         br.close();
                     } catch (IOException e) {
-                        Toast.makeText(NotepadHome.this, "There seems to be an issue. Please contact us.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(NotepadHome.this, "There seems to be an issue. Please contact us.", Toast.LENGTH_SHORT).show();
                     }
                     importantIsOffed();
                     importantEnabled = 0;
@@ -286,7 +287,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
             title.setText("");
             notes.setText("");
         } else {
-            Toast.makeText(NotepadHome.this, "Important is enabled, disable it if u wish to delete the file", Toast.LENGTH_LONG).show();
+            Toast.makeText(NotepadHome.this, "Important is enabled, disable it if u wish to delete the file", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -330,35 +331,23 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                 notesFile.getParentFile().mkdirs();
                 FileOutputStream fileOutputStream = new FileOutputStream(notesFile, false);
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
-                outputStreamWriter.append(calFormat);
-                outputStreamWriter.append("\n\r");
-                outputStreamWriter.append("*************************");
-                outputStreamWriter.append("\n\r");
                 outputStreamWriter.append(notes.getText().toString());
-                outputStreamWriter.append("\n\r");
-                outputStreamWriter.append("*************************");
                 outputStreamWriter.close();
                 fileOutputStream.close();
-                Toast.makeText(NotepadHome.this, "Your data has been Saved to " + calFormat + "." + "txt in your downloads->Notepad folder", Toast.LENGTH_LONG).show();
+                Toast.makeText(NotepadHome.this, "Your data has been Saved to " + calFormat + "." + "txt in your downloads->Notepad folder", Toast.LENGTH_SHORT).show();
 
             } else {
                 File notesFile = new File(path + "/Notepad", title.getText().toString().replaceAll("\\s", "") + "." + "txt");
                 notesFile.getParentFile().mkdirs();
                 FileOutputStream fileOutputStream = new FileOutputStream(notesFile, false);
                 OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
-                outputStreamWriter.append(title.getText().toString());
-                outputStreamWriter.append("\n\r");
-                outputStreamWriter.append("*************************");
-                outputStreamWriter.append("\n\r");
                 outputStreamWriter.append(notes.getText().toString());
-                outputStreamWriter.append("\n\r");
-                outputStreamWriter.append("*************************");
                 outputStreamWriter.close();
                 fileOutputStream.close();
-                Toast.makeText(NotepadHome.this, "Your data has been Saved to " + title.getText().toString().replaceAll("\\s", "") + "." + "txt in your downloads->Notepad folder", Toast.LENGTH_LONG).show();
+                Toast.makeText(NotepadHome.this, "Your data has been Saved to " + title.getText().toString().replaceAll("\\s", "") + "." + "txt in your downloads->Notepad folder", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Toast.makeText(NotepadHome.this, e.toString() + " please notify us about the issue. ", Toast.LENGTH_LONG).show();
+            Toast.makeText(NotepadHome.this, e.toString() + " please notify us about the issue. ", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -391,14 +380,14 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                 isFabOpen();
                 if (title.getText().toString().isEmpty()) {
                     if (notes.getText().toString().isEmpty()) {
-                        Toast.makeText(NotepadHome.this, "This is a new note!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(NotepadHome.this, "This is a new note!", Toast.LENGTH_SHORT).show();
                     } else {
                         calendar = Calendar.getInstance();
                         String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.YEAR) + "   " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND);
                         sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + calFormat + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
                         importantEnabled = 0;
                         sqLiteDatabase.execSQL("INSERT or replace INTO TitleNotes VALUES('" + calFormat + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
-                        Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_LONG).show();
+                        Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
                         title.setText("");
                         notes.setText("");
                         importantIsOffed();
@@ -407,7 +396,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                     sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
                     importantEnabled = 0;
                     sqLiteDatabase.execSQL("INSERT or replace INTO TitleNotes VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
-                    Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_LONG).show();
+                    Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
                     title.setText("");
                     notes.setText("");
                     importantIsOffed();
@@ -452,9 +441,11 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
         return super.onOptionsItemSelected(item);
     }
 
-    /** On Back Pressed*/
+    /**
+     * On Back Pressed
+     */
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
                 && keyCode == KeyEvent.KEYCODE_BACK
                 && event.getRepeatCount() == 0) {
@@ -581,16 +572,82 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
             case MotionEvent.ACTION_UP: {
                 x2 = touchevent.getX();
                 if (x1 < x2) {
-                    Intent listIntent = new Intent(NotepadHome.this, NotepadListHome.class);
-                    startActivity(listIntent);
-                    finish();
-                    overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+                    if (title.getText().toString().isEmpty()) {
+                        if (notes.getText().toString().isEmpty()) {
+                            if (importantEnabled == 0) {
+                                Intent listIntent = new Intent(this, NotepadListHome.class);
+                                startActivity(listIntent);
+                                finish();
+                                overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+                            } else {
+                                importantEnabled = 0;
+                                sqLiteDatabase.execSQL("INSERT or replace INTO TitleNotes VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                                Intent listIntent = new Intent(this, NotepadListHome.class);
+                                startActivity(listIntent);
+                                finish();
+                                overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+                            }
+                        } else {
+                            calendar = Calendar.getInstance();
+                            String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.YEAR) + "   " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND);
+                            sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + calFormat + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                            importantEnabled = 0;
+                            sqLiteDatabase.execSQL("INSERT or replace INTO TitleNotes VALUES('" + calFormat + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                            Intent listIntent = new Intent(this, NotepadListHome.class);
+                            startActivity(listIntent);
+                            finish();
+                            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+                            Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                        importantEnabled = 0;
+                        sqLiteDatabase.execSQL("INSERT or replace INTO TitleNotes VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                        Intent listIntent = new Intent(this, NotepadListHome.class);
+                        startActivity(listIntent);
+                        finish();
+                        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+                        Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 if (x1 > x2) {
-                    Intent homeIntent = new Intent(NotepadHome.this, NotepadHome.class);
-                    startActivity(homeIntent);
-                    finish();
-                    overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                    if (title.getText().toString().isEmpty()) {
+                        if (notes.getText().toString().isEmpty()) {
+                            if (importantEnabled == 0) {
+                                Intent listIntent = new Intent(this, NotepadListHome.class);
+                                startActivity(listIntent);
+                                finish();
+                                overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                            } else {
+                                importantEnabled = 0;
+                                sqLiteDatabase.execSQL("INSERT or replace INTO TitleNotes VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                                Intent listIntent = new Intent(this, NotepadListHome.class);
+                                startActivity(listIntent);
+                                finish();
+                                overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                            }
+                        } else {
+                            calendar = Calendar.getInstance();
+                            String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.YEAR) + "   " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND);
+                            sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + calFormat + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                            importantEnabled = 0;
+                            sqLiteDatabase.execSQL("INSERT or replace INTO TitleNotes VALUES('" + calFormat + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                            Intent listIntent = new Intent(this, NotepadListHome.class);
+                            startActivity(listIntent);
+                            finish();
+                            overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                            Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        sqLiteDatabase.execSQL("INSERT or replace INTO NotesMetaData VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                        importantEnabled = 0;
+                        sqLiteDatabase.execSQL("INSERT or replace INTO TitleNotes VALUES('" + title.getText().toString().replace("'", "''") + "'" + "," + "'" + notes.getText().toString().replace("'", "''") + "'" + "," + "'" + importantEnabled + "'" + ");");
+                        Intent listIntent = new Intent(this, NotepadListHome.class);
+                        startActivity(listIntent);
+                        finish();
+                        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                        Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 break;
             }

@@ -7,7 +7,7 @@
         app:showAsAction="never">
     </item>
 
-    <item android:title="Contact Us"
+    <item android:title="About Notepad"
         android:id="@+id/contactUs"
         app:showAsAction="never">
     </item>

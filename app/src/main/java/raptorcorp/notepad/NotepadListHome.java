@@ -21,6 +21,10 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.ArrayList;
 
@@ -29,12 +33,20 @@ public class NotepadListHome extends NotepadHome implements GestureDetector.OnGe
     SwipeMenuListView notepadList;
     ArrayList<String> notepadListArray;
     ArrayAdapter<String> notepadAdapter;
+    private AdView notepadListAdView;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notepad_list_home);
+
+        /** Notepad Home Ad */
+        MobileAds.initialize(this, "ca-app-pub-8428592077917623~9528816950");
+        notepadListAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        notepadListAdView.loadAd(adRequest);
+
         notepadList = findViewById(R.id.notepadListView);
         notepadListArray = new ArrayList<>();
         Cursor titleCursors = sqLiteDatabase.rawQuery("Select title from NotesMetaData", null);

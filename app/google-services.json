@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "633069860991",
+    "firebase_url": "https://notepad-90e61.firebaseio.com",
+    "project_id": "notepad-90e61",
+    "storage_bucket": "notepad-90e61.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633069860991:android:c7eb960ca0bd39e8",
+        "android_client_info": {
+          "package_name": "raptorcorp.notepad"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "633069860991-fujg3or4oddsci7a5rid8bffhkf4io4q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBI2ERyW-rY3ny6-RJRo4AdG0JOZiZFy0o"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

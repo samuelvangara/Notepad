@@ -16,6 +16,7 @@
     <string name="compose_shortcut_long_label2">Notes List</string>
     <string name="importantOff">importantOff</string>
     <string name="importantOn">importantOn</string>
+    <string name="Banner">ca-app-pub-8428592077917623~9528816950</string>
     <string name="compose_disabled_message2">disabled</string>
     <string name="title_activity_notepad_list_drawer">Notepad</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -25,9 +26,9 @@
     <string name="large_text">
         "***About the Application.***\n\n"
 
-        "1. A light weight application to make notes, So that you can concentrate on bigger things in life.\n"
+        "1. A light weight application to take notes, So that you can concentrate on bigger things in life.\n"
         "2. Your data is backed up securely (So much that even we can’t access it) to restore during application reinstalls.\n"
-        "3. To avoid those overly curious people who you give your phone to, there is authentication requirement for marked notes.\n"
+        "3. To avoid those overly curious people whom you give your phone to, there is authentication requirement for marked notes.\n"
         "4. Hassel free operation as your data is saved instantaneous (every moment literally not even kidding).\n"
         "5. This application support across devices of various screen sizes. Whatever it is Phones, tablets, 16:9, 18:9 phablets we got you covered. \n"
         "6. Share the saved notes via any application which supports text or save the notes as a text file.\n"
@@ -35,13 +36,13 @@
 
         "***Things you could expect from this application:*** \n\n"
 
-        "1. Support across devices.\n"
-		"2. Security authentication  no way to read unless saved.\n"
-		"3. Important feature to prevent delete from list or during writing.\n"
-        "4. Light weight.\n"
-		"5. One stop need.\n"
-        "6. Save to .txt. \n"
-        "7. Open .txt. \n"
+        "1. Support across devices. \n"
+        "2. Secure - no way to read the date unless saved to text file. \n"
+		"3. Stared Notes requires authentication for any modifications.\n"
+		"4. Fool proof feature to prevent deleting of Stared Notes.\n"
+        "5. Light weight application – not a resource hungry app. \n"
+        "6. Save to a .txt file. \n"
+        "7. Open any .txt files. \n"
         "8. Share the content across device via text. \n \n"
 
 		"***Things we expect from this application.*** \n \n"
@@ -51,7 +52,7 @@
 
 		"***About us.*** \n"
 
-		"The contents of this were developed from the scratch, and all the contents are @Copyright protected. Any infringement will be subject to copyright law. \n"
+		"The contents of this were developed from the scratch, and all the contents are ©Copyright protected. Any infringement will be subject to copyright law. \n"
 
     </string>
 </resources>

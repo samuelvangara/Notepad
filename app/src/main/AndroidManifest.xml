@@ -46,10 +46,12 @@
             android:name=".NotepadListHome"
             android:label="Notes List"
             android:resizeableActivity="true"
+            android:parentActivityName=".NotepadHome"
             android:supportsPictureInPicture="true" />
         <activity
             android:name=".AboutNotepad"
             android:label="@string/title_activity_about_notepad"
+            android:parentActivityName=".NotepadHome"
             android:resizeableActivity="true"
             android:theme="@style/AppTheme.NoActionBar"/>
     </application>

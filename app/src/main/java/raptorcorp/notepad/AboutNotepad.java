@@ -22,7 +22,9 @@ public class AboutNotepad extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent getBackToNotepadHome = new Intent(AboutNotepad.this,NotepadHome.class);
+                getBackToNotepadHome.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(getBackToNotepadHome);
+                finish();
             }
         });
     }

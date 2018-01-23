@@ -10,7 +10,7 @@
     <EditText
         android:id="@+id/notes"
         android:layout_width="match_parent"
-        android:layout_height="783dp"
+        android:layout_height="796dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -193,4 +193,5 @@
         app:layout_constraintStart_toStartOf="@+id/theTitle"
         app:layout_constraintTop_toTopOf="@+id/theTitle"
         app:srcCompat="@android:drawable/btn_star_big_on" />
+
 </android.support.constraint.ConstraintLayout>

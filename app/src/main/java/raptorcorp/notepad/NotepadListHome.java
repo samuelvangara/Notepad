@@ -245,7 +245,6 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
                 isFabOpen();
                 Intent AboutNotepadIntent = new Intent(this, AboutNotepad.class);
                 startActivity(AboutNotepadIntent);
-                finish();
                 break;
             case R.id.Browse:
                 isFabOpen();

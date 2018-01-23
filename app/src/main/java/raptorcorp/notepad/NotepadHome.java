@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
 import java.io.BufferedReader;
@@ -94,6 +95,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
         }
 
         /**Database Instantiation */
+
         notepadDAO.DbAndTableCreation(context);
         Intent intentToStartNotepad = getIntent();
         Cursor titleCursor, notesCursor, importantEnabledCursor;
@@ -205,7 +207,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void importantOffOnClick(View view) {
         importantIsOned();
-        if (title.getText().toString().isEmpty()) {
+        if (title.getText().toString().isEmpty() || title.getText().toString().trim().length() <= 0) {
             if (notes.getText().toString().isEmpty()) {
                 Toast.makeText(this, getResources().getString(R.string.important_Enabled), Toast.LENGTH_SHORT).show();
             }
@@ -222,7 +224,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public void importantOnOnClick(View view) {
         importantIsOffed();
-        if (title.getText().toString().isEmpty()) {
+        if (title.getText().toString().isEmpty() || title.getText().toString().trim().length() <= 0) {
             if (notes.getText().toString().isEmpty()) {
                 Toast.makeText(this, getResources().getString(R.string.important_Enabled), Toast.LENGTH_SHORT).show();
             }
@@ -373,7 +375,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
     public void onSaveFabClick(View view) {
         try {
             isFabOpen();
-            if (title.getText().toString().isEmpty()) {
+            if (title.getText().toString().isEmpty() || title.getText().toString().trim().length() <= 0) {
                 calendar = Calendar.getInstance();
                 String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + ":" + (calendar.get(Calendar.MONTH) + 1) + ":" + calendar.get(Calendar.YEAR) + ":" + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE);
                 File notesFile = new File(path.toString() + "/Notepad", calFormat + "." + "txt");
@@ -417,7 +419,6 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                 isFabOpen();
                 Intent AboutNotepadIntent = new Intent(this, AboutNotepad.class);
                 startActivity(AboutNotepadIntent);
-                finish();
                 break;
             case R.id.Browse:
                 isFabOpen();
@@ -455,12 +456,18 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                 }
                 break;
             case R.id.notepadList:
-                if (title.getText().toString().isEmpty()) {
+                if (title.getText().toString().isEmpty() || title.getText().toString().trim().length() <= 0) {
                     if (notes.getText().toString().isEmpty()) {
-                        Intent listIntent = new Intent(this, NotepadListHome.class);
-                        startActivity(listIntent);
-                        finish();
-                        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+                        if (importantEnabled == 0) {
+                            Intent listIntent = new Intent(this, NotepadListHome.class);
+                            startActivity(listIntent);
+                            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+                        } else {
+                            Intent listIntent = new Intent(this, NotepadListHome.class);
+                            startActivity(listIntent);
+                            importantIsOffed();
+                            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+                        }
                     } else {
                         calendar = Calendar.getInstance();
                         String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.YEAR) + "   " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND);
@@ -468,7 +475,6 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                         notepadDAO.InsertIntoNotesMetaData(calFormat, notes.getText().toString().replace("'", "''"), importantEnabled);
                         Intent listIntent = new Intent(this, NotepadListHome.class);
                         startActivity(listIntent);
-                        finish();
                         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
                         Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
                     }
@@ -477,7 +483,6 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                     notepadDAO.InsertIntoNotesMetaData(title.getText().toString().replace("'", "''"), notes.getText().toString().replace("'", "''"), importantEnabled);
                     Intent listIntent = new Intent(this, NotepadListHome.class);
                     startActivity(listIntent);
-                    finish();
                     overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
                     Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
                 }
@@ -601,12 +606,20 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
             case MotionEvent.ACTION_UP: {
                 x2 = touchevent.getX();
                 if (x1 < x2) {
-                    if (title.getText().toString().isEmpty()) {
+                    if (title.getText().toString().isEmpty() || title.getText().toString().trim().length() <= 0) {
                         if (notes.getText().toString().isEmpty()) {
-                            Intent listIntent = new Intent(this, NotepadListHome.class);
-                            startActivity(listIntent);
-                            finish();
-                            overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+                            if (importantEnabled == 0) {
+                                Intent listIntent = new Intent(this, NotepadListHome.class);
+                                startActivity(listIntent);
+                                finish();
+                                overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+                            } else {
+                                Intent listIntent = new Intent(this, NotepadListHome.class);
+                                startActivity(listIntent);
+                                finish();
+                                importantIsOffed();
+                                overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
+                            }
                         } else {
                             calendar = Calendar.getInstance();
                             String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.YEAR) + "   " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND);
@@ -629,12 +642,20 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                     }
                 }
                 if (x1 > x2) {
-                    if (title.getText().toString().isEmpty()) {
+                    if (title.getText().toString().isEmpty() || title.getText().toString().trim().length() <= 0) {
                         if (notes.getText().toString().isEmpty()) {
-                            Intent listIntent = new Intent(this, NotepadListHome.class);
-                            startActivity(listIntent);
-                            finish();
-                            overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                            if (importantEnabled == 0) {
+                                Intent listIntent = new Intent(this, NotepadListHome.class);
+                                startActivity(listIntent);
+                                finish();
+                                overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                            } else {
+                                Intent listIntent = new Intent(this, NotepadListHome.class);
+                                startActivity(listIntent);
+                                finish();
+                                importantIsOffed();
+                                overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+                            }
                         } else {
                             calendar = Calendar.getInstance();
                             String calFormat = calendar.get(Calendar.DAY_OF_MONTH) + "/" + (calendar.get(Calendar.MONTH) + 1) + "/" + calendar.get(Calendar.YEAR) + "   " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE) + ":" + calendar.get(Calendar.SECOND);

@@ -1,15 +1,16 @@
 package raptorcorp.notepad;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
-import android.os.Environment;
 import android.support.annotation.RequiresApi;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -28,10 +29,8 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -44,7 +43,6 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
     ArrayList<String> notepadListArray;
     ArrayAdapter<String> notepadAdapter;
     public NotepadDAO notepadListDAO = new NotepadDAO();
-    private AdView notepadListAdView;
     public EditText notes, title;
     public static float x1, x2;
     public FloatingActionButton mainFab, saveFab, shareFab, deleteFab;
@@ -52,9 +50,8 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
     public static Animation fab_open, fab_close, rotate_forward, rotate_backward, slide_to_right, slide_to_left, slide_from_right, slide_from_left;
     public ImageView importantOffButton, importantOnButton;
     public int importantEnabled;
-    public static File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
     public static final int FILE_RESULT_CODE = 1;
-    String titleTest,notesTest;
+    String titleTest, notesTest;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -63,10 +60,10 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
         setContentView(R.layout.activity_notepad_list_home);
 
         /** NotepadList Ad */
-        /**  MobileAds.initialize(this, "ca-app-pub-8428592077917623~9528816950");
-        notepadListAdView = findViewById(R.id.adView);
+        MobileAds.initialize(this, "ca-app-pub-8428592077917623~9528816950");
+        AdView notepadListAdView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
-        notepadListAdView.loadAd(adRequest);*/
+        notepadListAdView.loadAd(adRequest);
 
         /** Label Definitions*/
         fab_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
@@ -86,7 +83,7 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
         shareFab = findViewById(R.id.shareFab);
         deleteFab = findViewById(R.id.deleteFab);
         notepadList = findViewById(R.id.notepadListView);
-        Context context = getApplicationContext();
+        final Context context = getApplicationContext();
         notepadListArray = new ArrayList<>();
         notepadListDAO.DbAndTableCreation(context);
         Cursor retrieveListCursor = notepadListDAO.SelectAllFromNotesMetaData();
@@ -106,7 +103,7 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
                 Cursor importantEnabledCursor = notepadListDAO.SelectImportantEnabledFromNotesMetaDataBasedOnRetrieve(retrieve);
                 if (titleCursor.moveToFirst()) {
                     do {
-                         titleTest = titleCursor.getString(0);
+                        titleTest = titleCursor.getString(0);
                     } while (titleCursor.moveToNext());
                 }
                 if (notesCursor.moveToFirst()) {
@@ -158,7 +155,7 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
         notepadList.setMenuCreator(creator);
         notepadList.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
             @Override
-            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+            public boolean onMenuItemClick(final int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
                         String deleteCheck = notepadListArray.get(position);
@@ -171,14 +168,34 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
                         if (importantEnabled == 1) {
                             Toast.makeText(NotepadListHome.this, "Important is enabled, disable it if u wish to delete the file", Toast.LENGTH_SHORT).show();
                         } else {
-                            notepadListDAO.DeleteFromTitleNotesBasedOnTitle(notepadListArray.get(position).replace("'", "''"));
-                            notepadListDAO.DeleteFromNotesMetaDataBasedOnTitle(notepadListArray.get(position).replace("'", "''"));
-                            Intent addIntent = new Intent(NotepadListHome.this, NotepadListHome.class);
-                            addIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(addIntent);
-                            finish();
+                            AlertDialog.Builder alert = new AlertDialog.Builder(notepadList.getContext());
+                            alert.setTitle("Delete?");
+                            alert.setMessage("Are you sure you want to delete this note?");
+                            alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which) {
+                                    notepadListDAO.DeleteFromTitleNotesBasedOnTitle(notepadListArray.get(position).replace("'", "''"));
+                                    notepadListDAO.DeleteFromNotesMetaDataBasedOnTitle(notepadListArray.get(position).replace("'", "''"));
+                                    Intent addIntent = new Intent(NotepadListHome.this, NotepadListHome.class);
+                                    addIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(addIntent);
+                                    finish();
+                                    dialog.dismiss();
+                                    Toast.makeText(NotepadListHome.this, "Deletion Successful!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog,
+                                                    int which) {
+                                    dialog.dismiss();
+                                    Toast.makeText(NotepadListHome.this, "Cancel it is!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            alert.setIcon(R.drawable.dustbin);
+                            alert.show();
                         }
-
                         break;
                 }
                 return false;
@@ -217,8 +234,8 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
                         Toast.makeText(NotepadListHome.this, "There seems to be an issue. Please contact us.", Toast.LENGTH_SHORT).show();
                     }
                     Intent browseIntent = new Intent(this, NotepadHome.class);
-                    browseIntent.putExtra("Browsetitle",titleName);
-                    browseIntent.putExtra("Browsenotes",text.toString());
+                    browseIntent.putExtra("Browsetitle", titleName);
+                    browseIntent.putExtra("Browsenotes", text.toString());
                     browseIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(browseIntent);
                     finish();
@@ -255,7 +272,7 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
             case R.id.addlist:
                 isFabOpen();
                 Intent addIntent = new Intent(this, NotepadHome.class);
-                addIntent.putExtra("new","");
+                addIntent.putExtra("new", "");
                 addIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(addIntent);
                 finish();

@@ -27,7 +27,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:windowSoftInputMode="stateAlwaysHidden|adjustPan|adjustResize"
+        android:windowSoftInputMode="adjustResize|adjustPan"
         tools:ignore="GoogleAppIndexingWarning"
         tools:targetApi="n"
         android:fullBackupContent="true">

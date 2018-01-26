@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
@@ -19,7 +18,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.GestureDetector;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -30,9 +28,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
@@ -48,6 +45,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
 
     EditText notes, title;
     public static float x1, x2;
+    private InterstitialAd interstitialAdNew, interstitialAdDelete;
     public FloatingActionButton mainFab, saveFab, shareFab, deleteFab;
     public static Boolean isFabOpen = false;
     public static Animation fab_open, fab_close, rotate_forward, rotate_backward, slide_to_right, slide_to_left, slide_from_right, slide_from_left;
@@ -86,6 +84,15 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
         deleteFab = findViewById(R.id.deleteFab);
         Context context = getApplicationContext();
 
+        /** Interstitial ads*/
+        MobileAds.initialize(this, "ca-app-pub-8428592077917623~9528816950");
+        interstitialAdNew = new InterstitialAd(this);
+        interstitialAdNew.setAdUnitId("ca-app-pub-8428592077917623/5585835967");
+        interstitialAdNew.loadAd(new AdRequest.Builder().build());
+        interstitialAdDelete = new InterstitialAd(this);
+        interstitialAdDelete.setAdUnitId("ca-app-pub-8428592077917623/5173760665");
+        interstitialAdDelete.loadAd(new AdRequest.Builder().build());
+
         /**Requesting external storage permission.*/
         int check = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (check != PackageManager.PERMISSION_GRANTED) {
@@ -95,7 +102,6 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
         }
 
         /**Database Instantiation */
-
         notepadDAO.DbAndTableCreation(context);
         Intent intentToStartNotepad = getIntent();
         Cursor titleCursor, notesCursor, importantEnabledCursor;
@@ -199,6 +205,52 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
         } else {
             importantIsOffed();
         }
+
+        /** Interstitial Ad Delete*/
+        interstitialAdDelete.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+            }
+
+            @Override
+            public void onAdOpened() {
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+            }
+
+            @Override
+            public void onAdClosed() {
+            }
+        });
+
+        /** Interstitial Ad New*/
+        interstitialAdNew.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+            }
+
+            @Override
+            public void onAdOpened() {
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+            }
+
+            @Override
+            public void onAdClosed() {
+            }
+        });
     }
 
     /**
@@ -332,6 +384,9 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
      */
     public void onDeleteFabClick(View view) {
         isFabOpen();
+        if (interstitialAdDelete.isLoaded()) {
+            interstitialAdDelete.show();
+        }
         if (importantEnabled == 0) {
             notepadDAO.DeleteFromTitleNotes(title.getText().toString().replace("'", "''"), notes.getText().toString().replace("'", "''"));
             notepadDAO.DeleteFromNotesMetaData(title.getText().toString().replace("'", "''"), notes.getText().toString().replace("'", "''"));
@@ -427,6 +482,9 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                 startActivityForResult(browseIntent, FILE_RESULT_CODE);
                 break;
             case R.id.add:
+                if (interstitialAdNew.isLoaded()) {
+                    interstitialAdNew.show();
+                }
                 isFabOpen();
                 if (title.getText().toString().isEmpty()) {
                     if (notes.getText().toString().isEmpty()) {
@@ -567,7 +625,6 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
     /**
      * Gestures
      */
-
     @Override
     public boolean onDown(MotionEvent motionEvent) {
         return false;

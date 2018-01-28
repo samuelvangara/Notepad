@@ -33,6 +33,7 @@
         "5. This application support across devices of various screen sizes. Whatever it is Phones, tablets, 16:9, 18:9 phablets we got you covered. \n"
         "6. Share the saved notes via any application which supports text or save the notes as a text file.\n"
         "7. Browse to open a text file (.txt) and save them to notes or to save as a different text file.\n\n"
+        "8. Set up a reminder for your notes(BETA). \n\n"
 
         "***Things you could expect from this application:*** \n\n"
 
@@ -55,4 +56,7 @@
 		"The contents of this were developed from the scratch, and all the contents are ©Copyright protected. Any infringement will be subject to copyright law. \n"
 
     </string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="configure">Configure</string>
+    <string name="add_widget">Add widget</string>
 </resources>

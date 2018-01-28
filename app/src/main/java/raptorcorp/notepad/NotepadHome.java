@@ -534,7 +534,6 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                         Intent listIntent = new Intent(this, NotepadListHome.class);
                         startActivity(listIntent);
                         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
-                        Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     notepadDAO.InsertIntoTitleNotes(title.getText().toString().replace("'", "''"), notes.getText().toString().replace("'", "''"), importantEnabled);
@@ -542,7 +541,6 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                     Intent listIntent = new Intent(this, NotepadListHome.class);
                     startActivity(listIntent);
                     overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
-                    Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -686,7 +684,6 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                             startActivity(listIntent);
                             finish();
                             overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
-                            Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         notepadDAO.InsertIntoTitleNotes(title.getText().toString().replace("'", "''"), notes.getText().toString().replace("'", "''"), importantEnabled);
@@ -695,7 +692,6 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                         startActivity(listIntent);
                         finish();
                         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right);
-                        Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
                     }
                 }
                 if (x1 > x2) {
@@ -722,7 +718,6 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                             startActivity(listIntent);
                             finish();
                             overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
-                            Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         notepadDAO.InsertIntoTitleNotes(title.getText().toString().replace("'", "''"), notes.getText().toString().replace("'", "''"), importantEnabled);
@@ -731,7 +726,6 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                         startActivity(listIntent);
                         finish();
                         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
-                        Toast.makeText(NotepadHome.this, "Notes saved", Toast.LENGTH_SHORT).show();
                     }
                 }
                 break;

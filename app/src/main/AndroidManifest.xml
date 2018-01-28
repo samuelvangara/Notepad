@@ -6,8 +6,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
-    <uses-permission android:name = "android.permission.INTERNET" />
-    <uses-permission android:name = "android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <supports-screens
         android:anyDensity="true"
@@ -19,6 +20,7 @@
     <application
         android:allowBackup="true"
         android:allowTaskReparenting="true"
+        android:fullBackupContent="true"
         android:fullBackupOnly="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -29,15 +31,16 @@
         android:theme="@style/AppTheme"
         android:windowSoftInputMode="adjustResize|adjustPan"
         tools:ignore="GoogleAppIndexingWarning"
-        tools:targetApi="n"
-        android:fullBackupContent="true">
+        tools:targetApi="n">
         <activity
             android:name=".NotepadHome"
             android:supportsPictureInPicture="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
@@ -45,15 +48,19 @@
         <activity
             android:name=".NotepadListHome"
             android:label="Notes List"
-            android:resizeableActivity="true"
             android:parentActivityName=".NotepadHome"
+            android:resizeableActivity="true"
             android:supportsPictureInPicture="true" />
+
+        <receiver android:name=".ReminderReceiver" />
+
         <activity
             android:name=".AboutNotepad"
             android:label="@string/title_activity_about_notepad"
             android:parentActivityName=".NotepadHome"
             android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+
     </application>
 
 </manifest>

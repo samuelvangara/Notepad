@@ -1,5 +1,10 @@
 package raptorcorp.notepad;
 
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,11 +12,13 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,9 +28,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TimePicker;
 import android.widget.Toast;
+
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
@@ -31,11 +41,14 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.Year;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class NotepadListHome extends AppCompatActivity implements GestureDetector.OnGestureListener {
 
@@ -52,12 +65,25 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
     public int importantEnabled;
     public static final int FILE_RESULT_CODE = 1;
     String titleTest, notesTest;
+    private int year, month, day, hour, minute;
+    private DatePickerDialog.OnDateSetListener datePickerDialogListener;
+    private DatePickerDialog datePickerDialog;
+    private TimePickerDialog.OnTimeSetListener timePickerDialogListener;
+    private TimePickerDialog timePickerDialog;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notepad_list_home);
+
+        /**Calendar Instance */
+        Calendar calendar = Calendar.getInstance();
+        year = calendar.get(Calendar.YEAR);
+        month = calendar.get(Calendar.MONTH);
+        day = calendar.get(Calendar.DAY_OF_MONTH);
+        hour = calendar.get(Calendar.HOUR_OF_DAY);
+        minute = calendar.get(Calendar.MINUTE);
 
         /** NotepadList Ad */
         MobileAds.initialize(this, "ca-app-pub-8428592077917623~9528816950");
@@ -145,6 +171,11 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
             public void create(SwipeMenu menu) {
+                SwipeMenuItem reminderItem = new SwipeMenuItem(getApplicationContext());
+                reminderItem.setBackground(new ColorDrawable(Color.WHITE));
+                reminderItem.setWidth(100);
+                reminderItem.setIcon(R.drawable.reminder);
+                menu.addMenuItem(reminderItem);
                 SwipeMenuItem deleteItem = new SwipeMenuItem(getApplicationContext());
                 deleteItem.setBackground(new ColorDrawable(Color.WHITE));
                 deleteItem.setWidth(100);
@@ -154,10 +185,17 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
         };
         notepadList.setMenuCreator(creator);
         notepadList.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public boolean onMenuItemClick(final int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
+                        Toast.makeText(NotepadListHome.this, "This is a beta!", Toast.LENGTH_SHORT).show();
+                        timePickerDialog = new TimePickerDialog(NotepadListHome.this, R.style.MyDatePicker, timePickerDialogListener, hour, minute, true);
+                        datePickerDialog = new DatePickerDialog(NotepadListHome.this, R.style.MyDatePicker, datePickerDialogListener, year, month, day);
+                        datePickerDialog.show();
+                        break;
+                    case 1:
                         String deleteCheck = notepadListArray.get(position);
                         Cursor importantEnabledCursor = notepadListDAO.SelectImportantEnabledFromNotesMetaDataBasedOnRetrieve(deleteCheck);
                         if (importantEnabledCursor.moveToFirst()) {
@@ -177,10 +215,24 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
                                                     int which) {
                                     notepadListDAO.DeleteFromTitleNotesBasedOnTitle(notepadListArray.get(position).replace("'", "''"));
                                     notepadListDAO.DeleteFromNotesMetaDataBasedOnTitle(notepadListArray.get(position).replace("'", "''"));
-                                    Intent addIntent = new Intent(NotepadListHome.this, NotepadListHome.class);
-                                    addIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    startActivity(addIntent);
-                                    finish();
+                                    final Handler handler = new Handler();
+                                    Runnable deleteRunnable = new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            notepadListArray = new ArrayList<>();
+                                            notepadListDAO.DbAndTableCreation(context);
+                                            Cursor retrieveListCursor = notepadListDAO.SelectAllFromNotesMetaData();
+                                            if (retrieveListCursor.moveToFirst()) {
+                                                do {
+                                                    notepadListArray.add(retrieveListCursor.getString(0));
+                                                } while (retrieveListCursor.moveToNext());
+                                            }
+                                            notepadAdapter = new ArrayAdapter<>(NotepadListHome.this, android.R.layout.simple_list_item_1, notepadListArray);
+                                            notepadList.setAdapter(notepadAdapter);
+                                            handler.postDelayed(this, 1000);
+                                        }
+                                    };
+                                    handler.post(deleteRunnable);
                                     dialog.dismiss();
                                     Toast.makeText(NotepadListHome.this, "Deletion Successful!", Toast.LENGTH_SHORT).show();
                                 }
@@ -201,6 +253,33 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
                 return false;
             }
         });
+
+
+        datePickerDialogListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int yearSet, int monthSet, int dayOfMonthSet) {
+                year = yearSet;
+                month = monthSet;
+                day = dayOfMonthSet;
+                timePickerDialog.show();
+
+            }
+        };
+        timePickerDialogListener = new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minuteSet) {
+                hour = hourOfDay;
+                minute = minuteSet;
+                Calendar calConvert = Calendar.getInstance();
+                calConvert.set(year,month,day,hour,minute,0);
+                long startTime = calConvert.getTimeInMillis();
+                Intent reminderIntent = new Intent(NotepadListHome.this, ReminderReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, reminderIntent, 0);
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, startTime, pendingIntent);
+                Toast.makeText(NotepadListHome.this, "Reminder Set for "+hour+":"+minute+"   "+(month+1)+"/"+day+"/"+year, Toast.LENGTH_SHORT).show();
+            }
+        };
     }
 
     /**

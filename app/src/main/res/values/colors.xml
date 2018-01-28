@@ -6,4 +6,6 @@
     <color name="White">#FFFFFF</color>
     <color name="Black">#000000</color>
     <color name="Red">#4e342e</color>
+    <color name="header">#212121</color>
+    <color name="activated">#d32f2f</color>
 </resources>

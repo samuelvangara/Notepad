@@ -40,6 +40,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Calendar;
+import java.util.Objects;
 
 public class NotepadHome extends AppCompatActivity implements GestureDetector.OnGestureListener {
 

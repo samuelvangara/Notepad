@@ -107,7 +107,7 @@
         app:layout_constraintTop_toTopOf="@+id/notes"
         app:layout_constraintVertical_bias="0.991"
         app:rippleColor="#dd2c00"
-        app:srcCompat="@android:drawable/ic_menu_save" />
+        app:srcCompat="@drawable/save" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/shareFab"
@@ -131,7 +131,7 @@
         app:layout_constraintTop_toTopOf="@+id/notes"
         app:layout_constraintVertical_bias="0.996"
         app:rippleColor="#dd2c00"
-        app:srcCompat="@android:drawable/ic_menu_share" />
+        app:srcCompat="@drawable/share" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/deleteFab"
@@ -155,7 +155,7 @@
         app:layout_constraintTop_toTopOf="@+id/notes"
         app:layout_constraintVertical_bias="0.995"
         app:rippleColor="#dd2c00"
-        app:srcCompat="@android:drawable/ic_menu_delete" />
+       app:srcCompat="@drawable/trash" />
 
     <ImageView
         android:contentDescription="@string/importantOff"

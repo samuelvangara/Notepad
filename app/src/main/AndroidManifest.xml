@@ -37,30 +37,39 @@
             android:supportsPictureInPicture="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        <meta-data
+            android:name="android.app.shortcuts"
+            android:resource="@xml/shortcuts" />
+    </activity>
+    <activity
+        android:name=".NotepadListHome"
+        android:label="Notes List"
+        android:parentActivityName=".NotepadHome"
+        android:resizeableActivity="true"
+        android:supportsPictureInPicture="true" />
 
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
-        </activity>
-        <activity
-            android:name=".NotepadListHome"
-            android:label="Notes List"
-            android:parentActivityName=".NotepadHome"
-            android:resizeableActivity="true"
-            android:supportsPictureInPicture="true" />
+    <receiver android:name=".ReminderReceiver" />
 
-        <receiver android:name=".ReminderReceiver" />
+    <activity
+        android:name=".AboutNotepad"
+        android:label="@string/title_activity_about_notepad"
+        android:parentActivityName=".NotepadHome"
+        android:resizeableActivity="true"
+        android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity
-            android:name=".AboutNotepad"
-            android:label="@string/title_activity_about_notepad"
-            android:parentActivityName=".NotepadHome"
-            android:resizeableActivity="true"
-            android:theme="@style/AppTheme.NoActionBar" />
+</application>
 
-    </application>
-
-</manifest>
+    </manifest>

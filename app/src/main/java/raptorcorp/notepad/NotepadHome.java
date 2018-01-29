@@ -515,6 +515,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                 }
                 break;
             case R.id.notepadList:
+                isFabOpen();
                 if (title.getText().toString().isEmpty() || title.getText().toString().trim().length() <= 0) {
                     if (notes.getText().toString().isEmpty()) {
                         if (importantEnabled == 0) {
@@ -662,6 +663,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
             case MotionEvent.ACTION_UP: {
                 x2 = touchevent.getX();
                 if (x1 < x2) {
+                    isFabOpen();
                     if (title.getText().toString().isEmpty() || title.getText().toString().trim().length() <= 0) {
                         if (notes.getText().toString().isEmpty()) {
                             if (importantEnabled == 0) {
@@ -696,6 +698,7 @@ public class NotepadHome extends AppCompatActivity implements GestureDetector.On
                     }
                 }
                 if (x1 > x2) {
+                    isFabOpen();
                     if (title.getText().toString().isEmpty() || title.getText().toString().trim().length() <= 0) {
                         if (notes.getText().toString().isEmpty()) {
                             if (importantEnabled == 0) {

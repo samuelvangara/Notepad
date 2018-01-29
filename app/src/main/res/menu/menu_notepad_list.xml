@@ -12,11 +12,17 @@
         app:showAsAction="never">
     </item>
 
+    <item android:title="Reminder"
+        android:id="@+id/reminder"
+        android:icon="@drawable/reminder"
+        app:showAsAction="always"/>
+
     <item android:title="Add"
         android:id="@+id/addlist"
         android:icon="@drawable/add"
-        app:showAsAction="always">
-    </item>
+        app:showAsAction="always"/>
+
+
 
 
 </menu>

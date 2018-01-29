@@ -171,11 +171,6 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
             public void create(SwipeMenu menu) {
-                SwipeMenuItem reminderItem = new SwipeMenuItem(getApplicationContext());
-                reminderItem.setBackground(new ColorDrawable(Color.WHITE));
-                reminderItem.setWidth(100);
-                reminderItem.setIcon(R.drawable.reminder);
-                menu.addMenuItem(reminderItem);
                 SwipeMenuItem deleteItem = new SwipeMenuItem(getApplicationContext());
                 deleteItem.setBackground(new ColorDrawable(Color.WHITE));
                 deleteItem.setWidth(100);
@@ -190,12 +185,6 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
             public boolean onMenuItemClick(final int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
-                        Toast.makeText(NotepadListHome.this, "This is a beta!", Toast.LENGTH_SHORT).show();
-                        timePickerDialog = new TimePickerDialog(NotepadListHome.this, R.style.MyDatePicker, timePickerDialogListener, hour, minute, true);
-                        datePickerDialog = new DatePickerDialog(NotepadListHome.this, R.style.MyDatePicker, datePickerDialogListener, year, month, day);
-                        datePickerDialog.show();
-                        break;
-                    case 1:
                         String deleteCheck = notepadListArray.get(position);
                         Cursor importantEnabledCursor = notepadListDAO.SelectImportantEnabledFromNotesMetaDataBasedOnRetrieve(deleteCheck);
                         if (importantEnabledCursor.moveToFirst()) {
@@ -357,6 +346,12 @@ public class NotepadListHome extends AppCompatActivity implements GestureDetecto
                 finish();
                 overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
                 break;
+            case R.id.reminder:
+                timePickerDialog = new TimePickerDialog(NotepadListHome.this, R.style.MyDatePicker, timePickerDialogListener, hour, minute, true);
+                datePickerDialog = new DatePickerDialog(NotepadListHome.this, R.style.MyDatePicker, datePickerDialogListener, year, month, day);
+                datePickerDialog.show();
+                break;
+
         }
         return super.onOptionsItemSelected(item);
     }
